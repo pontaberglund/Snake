@@ -1,5 +1,7 @@
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.util.concurrent.TimeUnit;
 
 public class Frame extends JFrame {
@@ -46,4 +48,53 @@ public class Frame extends JFrame {
         headY--;
         this.repaint();
     }
+
+    public void moveDown() {
+        panels[headX][headY].setBackground(Color.orange);
+        panels[headX][headY+1].setBackground(Color.black);
+        headY++;
+        this.repaint();
+    }
+
+    public void moveRight() {
+        panels[headX][headY].setBackground(Color.orange);
+        panels[headX+1][headY].setBackground(Color.black);
+        headX++;
+        this.repaint();
+    }
+
+    public void moveLeft() {
+        panels[headX][headY].setBackground(Color.orange);
+        panels[headX-1][headY].setBackground(Color.black);
+        headX--;
+        this.repaint();
+    }
+
+    public void addInput() {
+        this.addKeyListener(new KeyListener() {
+            @Override
+            public void keyTyped(KeyEvent e) {
+
+            }
+
+            @Override
+            public void keyPressed(KeyEvent e) {
+                if(e.getKeyChar() == 'w')
+                    moveUp();
+                else if(e.getKeyChar() == 's')
+                    moveDown();
+                else if(e.getKeyChar() == 'a')
+                    moveLeft();
+                else if(e.getKeyChar() == 'd')
+                    moveRight();
+            }
+
+            @Override
+            public void keyReleased(KeyEvent e) {
+
+            }
+        });
+    }
 }
+
+//TODO Add check if head out of bounds, then die
