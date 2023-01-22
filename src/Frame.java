@@ -27,10 +27,22 @@ public class Frame extends JFrame {
                 panels[x][y] = new JPanel();
                 panels[x][y].setBackground(Color.orange);
                 panels[x][y].setBounds(x*10,y*10,10,10);
-                this.add(panels[x][y]);
+                this.getContentPane().add(panels[x][y]);
             }
         }
         setApple();
+    }
+
+    public void rebuild() {
+        clearFrame();
+        length = 1;
+        for(int x = 0; x < panels.length; x++)
+            for(int y = 0; y < panels[x].length; y++) {
+                this.getContentPane().add(panels[x][y]);
+            }
+        coordinate = new int[50][50];
+        this.revalidate();
+        this.repaint();
     }
     public void delay(int milliseconds) {
         try {
@@ -47,8 +59,13 @@ public class Frame extends JFrame {
 
     public void setApple() {
         Random rand = new Random();
-        appleX = rand.nextInt(50);
-        appleY = rand.nextInt(50);
+        boolean cont = true;
+        while(cont) {
+            appleX = 5 + rand.nextInt(40);
+            appleY = 5 + rand.nextInt(40);
+            if(coordinate[appleX][appleY] == 0)
+                cont = false;
+        }
         panels[appleX][appleY].setBackground(Color.red);
     }
 
@@ -112,23 +129,50 @@ public class Frame extends JFrame {
     }
 
     public void runGame() {
+        length = 1;
+        boolean setApple = false;
         while(true) {
             try {
-                if (direction == 'u')
+                if (direction == 'u') {
+                    if(coordinate[headX][headY-1] != 0) {
+                        System.out.println("Dead");
+                        break;
+                    }
                     moveUp();
-                else if (direction == 'd')
+                }
+                else if (direction == 'd') {
+                    if(coordinate[headX][headY+1] != 0) {
+                        System.out.println("Dead");
+                        break;
+                    }
                     moveDown();
-                else if (direction == 'l')
+                }
+                else if (direction == 'l') {
+                    if(coordinate[headX-1][headY] != 0) {
+                        System.out.println("Dead");
+                        break;
+                    }
                     moveLeft();
-                else if (direction == 'r')
+                }
+                else if (direction == 'r') {
+                    if(coordinate[headX+1][headY] != 0) {
+                        System.out.println("Dead");
+                        break;
+                    }
                     moveRight();
+                }
                 if(headX == appleX && headY == appleY) {
                     length++;
+                    setApple = true;
                     panels[appleX][appleY].setBackground(Color.orange);
-                    setApple();
+                    //setApple();
                 }
                 this.updateScreen();
-                delay(200);
+                if(setApple) {
+                    setApple();
+                    setApple = false;
+                }
+                delay(150);
             }
             catch (IndexOutOfBoundsException e) {
                 System.out.println("Dead");
@@ -160,7 +204,31 @@ public class Frame extends JFrame {
             public void keyReleased(KeyEvent e) {}
         });
     }
+
+    public void clearFrame() {
+        this.getContentPane().removeAll();
+    }
+
+    public void showScore() {
+        clearFrame();
+        JLabel label = new JLabel("Score: " + length);
+        label.setForeground(Color.BLACK);
+        label.setFont(new Font("Serif", Font.PLAIN, 20));
+        JPanel panel  = new JPanel();
+        panel.setLayout(new GridBagLayout());
+        panel.setBounds(0, 0, 500, 500);
+        panel.setBackground(Color.red);
+        panel.add(label);
+        this.getContentPane().add(panel);
+        this.revalidate();
+        this.repaint();
+        System.out.println(length);
+    }
 }
 
-//TODO Add check if head collides with tail
+//TODO Fix better move method, collect right, left, up, down in the same method
 //TODO Better check if head out of bounds, then die
+//TODO Fix score
+//TODO Fix apple spawn bug
+
+//TODO Add borderLayout and resizeable window
